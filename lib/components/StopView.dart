@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'package:explore_fultter/components/ChatView.dart';
+import 'package:explore_fultter/utils/web_socket_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StopView extends StatefulWidget {
   final String stopTitle;
@@ -44,6 +45,41 @@ class _StopViewState extends State<StopView> {
     }
   }
 
+  Future<void> _showAlert(String message, String stop) async {
+    // Get UUID
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? uuid = prefs.getString('userId');
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vous avez vu les controlleurs à la station $stop ?'),
+          // content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Annuler'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                WebSocketManager().sendMessage({
+                  'alert': 'controlleurs',
+                  'stop': stop,
+                  'uuid': uuid,
+                } as Map<String, dynamic>);
+
+              },
+              child: const Text('Ajouter une alerte'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,13 +98,7 @@ class _StopViewState extends State<StopView> {
                   title: Text(item['stop_name'] ?? 'Unnamed Stop'),
                   subtitle: Text(item['stop_id'] ?? 'No ID'),
                   onTap: () {
-                    // Uncomment to navigate to ChatView
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatView(title: item['stop_name'] ?? 'Unnamed Stop'),
-                      ),
-                    );
+                    _showAlert('Vous avez séléctionné ${item['stop_name']}', item['stop_name']);
                   },
                 );
               },

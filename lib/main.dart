@@ -1,8 +1,10 @@
-import 'package:explore_fultter/views/MyHomePage/MyHomePage.dart';
-import 'package:explore_fultter/views/NotificationsPage/NotificationPage.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:explore_fultter/utils/web_socket_manager.dart';
+import 'package:explore_fultter/views/MyHomePage/MyHomePage.dart';
+import 'package:explore_fultter/views/NotificationsPage/NotificationPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +20,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
   String? _userId;
-  bool _isLoading = true; // To track if the UUID is being initialized
+  bool _isLoading = true;
 
   static final List<Widget> _pages = <Widget>[
     const MyHomePage(),
@@ -28,7 +30,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _initializeUUID(); // Call the initialization function
+    _initializeUUID();
+    WebSocketManager().connect();
   }
 
   Future<void> _initializeUUID() async {
@@ -36,19 +39,25 @@ class _MyAppState extends State<MyApp> {
     String? userId = prefs.getString('userId');
 
     if (userId == null) {
-      userId = const Uuid().v4(); // Generate a new UUID if none exists
+      userId = const Uuid().v4();
       await prefs.setString('userId', userId);
     }
 
     setState(() {
       _userId = userId;
-      _isLoading = false; // UUID has been initialized, hide loading screen
+      _isLoading = false;
     });
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 1) {
+        WebSocketManager().sendMessage({
+          'stop': 'greeting',
+          'uuid': 'Hello, World!',
+        });
+      }
     });
   }
 
@@ -63,10 +72,39 @@ class _MyAppState extends State<MyApp> {
         body: _isLoading
             ? const Center(
                 child:
-                    CircularProgressIndicator()) // Show a loading indicator while UUID is being initialized
-            : _pages[_selectedIndex], // Show main content when UUID is ready
+                    CircularProgressIndicator())
+            : Stack(
+                children: [
+                  _pages[_selectedIndex],
+                  // StreamBuilder for WebSocket messages
+                  Positioned.fill(
+                    child: StreamBuilder<Map>(
+                      stream: WebSocketManager().messageStream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          String stopData = snapshot.data!['stop'];
+                          String uuidData = snapshot.data!['uuid'];
+                          String alertData = snapshot.data!['alert'];
+
+                          // if(uuidData == _userId) {
+                          //   return Container(); // Return an empty container
+                          // }
+
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Notification $alertData reçue: $stopData de $uuidData')),
+                            );
+                          });
+                        }
+
+                        return Container(); // Return an empty container
+                      },
+                    ),
+                  ),
+                ],
+              ),
         bottomNavigationBar: _isLoading
-            ? null // Hide the bottom navigation while loading
+            ? null
             : BottomNavigationBar(
                 currentIndex: _selectedIndex,
                 onTap: _onItemTapped,
