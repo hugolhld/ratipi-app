@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:explore_fultter/components/ChatView.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -44,6 +43,32 @@ class _StopViewState extends State<StopView> {
     }
   }
 
+  Future<void> _showAlert(String message, String stop) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Vous avez vu les controlleurs à la station $stop ?'),
+          // content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Annuler'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Ajouter une alerte'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,13 +87,7 @@ class _StopViewState extends State<StopView> {
                   title: Text(item['stop_name'] ?? 'Unnamed Stop'),
                   subtitle: Text(item['stop_id'] ?? 'No ID'),
                   onTap: () {
-                    // Uncomment to navigate to ChatView
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatView(title: item['stop_name'] ?? 'Unnamed Stop'),
-                      ),
-                    );
+                    _showAlert('Vous avez séléctionné ${item['stop_name']}', item['stop_name']);
                   },
                 );
               },
