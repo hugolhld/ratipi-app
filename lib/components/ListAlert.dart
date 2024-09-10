@@ -23,34 +23,35 @@ class _ListAlertState extends State<ListAlert> {
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-            color: Colors.lightBlue[50],
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                const Icon(Icons.add),
-                // Wrap the ListTile in an Expanded widget
-                Expanded(
-                  child: ListTile(
-                    title: const Text('Ajouter une alerte !'),
-                    onTap: () {
-                      if (widget.routeId != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                StopView(stopTitle: widget.routeId!),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Route ID is missing!')),
-                        );
-                      }
-                    },
+              color: Colors.lightBlue[50],
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.add),
+                  // Wrap the ListTile in an Expanded widget
+                  Expanded(
+                    child: ListTile(
+                      title: const Text('Ajouter une alerte !'),
+                      onTap: () {
+                        if (widget.routeId != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  StopView(stopTitle: widget.routeId!),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Route ID is missing!')),
+                          );
+                        }
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             const Text(

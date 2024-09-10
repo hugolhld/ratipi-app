@@ -61,7 +61,9 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Hello, World!'),
         ),
         body: _isLoading
-            ? const Center(child: CircularProgressIndicator()) // Show a loading indicator while UUID is being initialized
+            ? const Center(
+                child:
+                    CircularProgressIndicator()) // Show a loading indicator while UUID is being initialized
             : _pages[_selectedIndex], // Show main content when UUID is ready
         bottomNavigationBar: _isLoading
             ? null // Hide the bottom navigation while loading

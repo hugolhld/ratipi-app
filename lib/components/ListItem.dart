@@ -32,7 +32,8 @@ class ListItem extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => StopView(stopTitle: subtitle!),
+                  builder: (context) =>
+                      ListAlert(title: title, routeId: subtitle),
                 ),
               );
             }
