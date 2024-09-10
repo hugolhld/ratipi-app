@@ -7,7 +7,7 @@ class Notificationpage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Notif Page'),
       ),
       body: const Center(
         child: Text(

@@ -1,4 +1,3 @@
-// import 'package:explore_fultter/views/MyHomePage/MyHomePage.dart';
 import 'package:explore_fultter/views/MyHomePage/MyHomePage.dart';
 import 'package:explore_fultter/views/NotificationsPage/NotificationPage.dart';
 import 'package:flutter/material.dart';
@@ -13,42 +12,45 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  int _selectedIndex = 0; // Index de la page actuellement sélectionnée
+  int _selectedIndex = 0;
+  String? _userId;
+  bool _isLoading = true; // To track if the UUID is being initialized
 
-  // Liste des pages à afficher en fonction de la sélection
   static final List<Widget> _pages = <Widget>[
     const MyHomePage(),
     const Notificationpage(),
   ];
 
-  // Fonction pour mettre à jour l'index sélectionné
+  @override
+  void initState() {
+    super.initState();
+    _initializeUUID(); // Call the initialization function
+  }
+
+  Future<void> _initializeUUID() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+
+    if (userId == null) {
+      userId = const Uuid().v4(); // Generate a new UUID if none exists
+      await prefs.setString('userId', userId);
+    }
+
+    setState(() {
+      _userId = userId;
+      _isLoading = false; // UUID has been initialized, hide loading screen
+    });
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
-
-  // Future<void> _initializeUUID() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? userId = prefs.getString('userId');
-
-  //   if (userId == null) {
-  //     // Generate a UUID if none exists
-  //     userId = const Uuid().v4();
-  //     // userId = Uuid().v4(); // Générer un UUID si aucun n'existe
-  //     await prefs.setString('userId', userId);
-  //   }
-    
-  //   // Naviguer vers la page principale de l'application
-  //   Navigator.of(context).pushReplacement(
-  //     MaterialPageRoute(builder: (context) => const MyApp()),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -58,21 +60,25 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Colors.tealAccent[400],
           title: const Text('Hello, World!'),
         ),
-        body: _pages[_selectedIndex], // Affiche la page en fonction de l'index
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex, // Indique l'élément actuellement sélectionné
-          onTap: _onItemTapped, // Déclenche l'événement lorsque l'utilisateur tape sur un élément
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
-              label: 'Notifications',
-            ),
-          ],
-        ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator()) // Show a loading indicator while UUID is being initialized
+            : _pages[_selectedIndex], // Show main content when UUID is ready
+        bottomNavigationBar: _isLoading
+            ? null // Hide the bottom navigation while loading
+            : BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.notifications),
+                    label: 'Notifications',
+                  ),
+                ],
+              ),
       ),
     );
   }

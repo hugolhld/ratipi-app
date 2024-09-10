@@ -1,4 +1,4 @@
-import 'package:explore_fultter/components/StopView.dart';
+import 'package:explore_fultter/components/ListAlert.dart';
 import 'package:flutter/material.dart';
 
 class ListItem extends StatelessWidget {
@@ -23,7 +23,7 @@ class ListItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => StopView(stopTitle: (subtitle!)),
+            builder: (context) => ListAlert(title: title, routeId: subtitle),
           ),
         );
       },

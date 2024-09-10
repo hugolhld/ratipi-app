@@ -8,7 +8,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Home page'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -22,13 +22,6 @@ class MyHomePage extends StatelessWidget {
                 Text('data'),
                 Text('cc'),
               ],
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.all(16.0), // Updated padding
-            child: Text(
-              'Welcome to the Home Page!',
-              style: TextStyle(fontSize: 24),
             ),
           ),
           Expanded(
