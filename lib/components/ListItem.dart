@@ -75,10 +75,10 @@ class _ListItemState extends State<ListItem> {
           borderRadius:
               BorderRadius.circular(15.0), // Coins arrondis de la carte
         ),
-        elevation: 4, // Ajoute une ombre sous la carte pour un effet 3D
+        elevation: 2, // Ajoute une ombre sous la carte pour un effet 3D
         child: InkWell(
           borderRadius: BorderRadius.circular(
-              15.0), // Assure que l'effet d'encre suit la forme arrondie
+              10), // Assure que l'effet d'encre suit la forme arrondie
           onTap: () {
             if (widget.subtitle != null) {
               Navigator.push(
