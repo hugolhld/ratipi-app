@@ -30,7 +30,7 @@ class _ListItemState extends State<ListItem> {
     List<String>? favorites = prefs.getStringList('favorites') ?? [];
 
     setState(() {
-      isFavorite = favorites.contains(widget.title);
+      isFavorite = favorites.contains(widget.subtitle);
     });
   }
 
@@ -38,14 +38,16 @@ class _ListItemState extends State<ListItem> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? favorites = prefs.getStringList('favorites') ?? [];
 
-    String favoriteItem = widget.title;
+    String? favoriteItem = widget.subtitle;
+
+    print(widget.subtitle);
 
     setState(() {
       if (favorites.contains(favoriteItem)) {
         favorites.remove(favoriteItem);
         isFavorite = false;
       } else {
-        favorites.add(favoriteItem);
+        favorites.add(favoriteItem!);
         isFavorite = true;
       }
     });

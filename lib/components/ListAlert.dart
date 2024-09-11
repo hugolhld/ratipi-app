@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore_fultter/components/StopView.dart';
 import 'package:explore_fultter/utils/firebase.dart';
@@ -80,9 +82,12 @@ class _ListAlertState extends State<ListAlert> {
                       itemCount: snapshot.data?.length ?? 0,
                       itemBuilder: (context, index) {
                         final item = snapshot.data?[index];
+                        final timestamp = item?['timestamp'];
+                        final DateTime notificationTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+                        final Duration timeDifference = DateTime.now().difference(notificationTime);
                         return ListTile(
                           title: Text(item?['stop'] ?? 'Unnamed Stop'),
-                          subtitle: Text(item?['uuid'] ?? 'No ID'),
+                          subtitle: Text('Il y a ${timeDifference.inMinutes} minutes'),
                           onTap: () {
                             // Handle tap on the notification
                           },
