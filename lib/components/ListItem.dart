@@ -132,13 +132,17 @@ class _ListItemState extends State<ListItem> {
                   ],
                 ),
                 const SizedBox(width: 8), // Espace entre les deux icônes
-                IconButton(
-                  color: Colors.red,
-                  onPressed: _toggleFavorite,
-                  icon: Icon(
-                    isFavorite
-                        ? Icons.favorite
-                        : Icons.favorite_border_outlined,
+                Transform.translate(
+                  offset: const Offset(0,
+                      -6), // Décale l'icône favori vers le haut (valeur négative pour déplacer vers le haut)
+                  child: IconButton(
+                    color: Colors.red,
+                    onPressed: _toggleFavorite,
+                    icon: Icon(
+                      isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border_outlined,
+                    ),
                   ),
                 ),
               ],
