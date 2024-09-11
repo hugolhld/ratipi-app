@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:explore_fultter/utils/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore_fultter/components/StopView.dart';
+import 'package:intl/intl.dart';
 
 class ListAlert extends StatefulWidget {
   final String title;
@@ -37,11 +37,14 @@ class _ListAlertState extends State<ListAlert> {
             const SizedBox(height: 20),
             ElevatedButton.icon(
               icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text('Ajouter une alerte !', style: TextStyle(color: Colors.white)),
+              label: const Text('Ajouter une alerte !',
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
                 elevation: 2,
               ),
               onPressed: () {
@@ -49,7 +52,8 @@ class _ListAlertState extends State<ListAlert> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => StopView(stopTitle: widget.routeId!),
+                      builder: (context) =>
+                          StopView(stopTitle: widget.routeId!),
                     ),
                   );
                 } else {
@@ -89,29 +93,56 @@ class _ListAlertState extends State<ListAlert> {
                             ),
                             elevation: 2,
                             child: ExpansionTile(
-                                title: Text(item?['stop'] ?? 'Unnamed Stop',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                subtitle: Text(
-                                    'Il y a ${timeDifference.inMinutes} minutes'),
-                                leading: const Icon(
-                                    Icons.notification_important,
-                                    color: Colors.red),
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.teal[50],
-                                      borderRadius: const BorderRadius.vertical(
-                                        bottom: Radius.circular(15),
+                              title: Text(item?['stop'] ?? 'Unnamed Stop'),
+                              subtitle: Text(
+                                  'Il y a ${timeDifference.inMinutes} minutes'),
+                              leading: const Icon(Icons.notification_important,
+                                  color: Colors.teal),
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Row(
+                                        children: [
+                                          Icon(Icons.warning,
+                                              color: Colors.red),
+                                          SizedBox(
+                                              width:
+                                                  8), // Espace entre l'icône et le texte
+                                          Text(
+                                            'Attention !',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight
+                                                  .bold, // Texte en gras
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    child: Text(
-                                      'Voici les détails de l\'alerte $index. Vous pouvez ajouter ici toutes les informations complémentaires, comme l\'heure exacte de l\'alerte, le lieu, ou tout autre détail pertinent.',
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
+                                      const SizedBox(
+                                          height:
+                                              8), // Espace entre le texte et l'heure
+                                      Text(
+                                        'Des contrôleurs ont été signalés à cet arrêt.',
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Heure signalée : ${DateFormat('HH:mm').format(notificationTime)}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight
+                                              .bold, // Heure signalée en gras
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ]),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
