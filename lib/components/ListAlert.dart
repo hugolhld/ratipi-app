@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore_fultter/components/StopView.dart';
 import 'package:explore_fultter/utils/firebase.dart';
@@ -17,7 +19,8 @@ class _ListAlertState extends State<ListAlert> {
   // Use getNotificationsByStop to get notifications
   Future<List<QueryDocumentSnapshot<Object?>>?> getNotifications() async {
     try {
-      final QuerySnapshot notifications = await FirestoreService().getNotificationsByStop(widget.routeId!);
+      final QuerySnapshot notifications =
+          await FirestoreService().getNotificationsByStop(widget.routeId!);
       print(notifications.docs);
       return notifications.docs;
     } catch (e) {
@@ -71,7 +74,6 @@ class _ListAlertState extends State<ListAlert> {
             ),
             const SizedBox(height: 20),
             Expanded(
-              // Wrapping FutureBuilder with Expanded so the ListView doesn't overflow
               child: FutureBuilder<List<QueryDocumentSnapshot<Object?>>?>(
                 future: getNotifications(),
                 builder: (context, snapshot) {
@@ -80,17 +82,48 @@ class _ListAlertState extends State<ListAlert> {
                   } else if (snapshot.hasError) {
                     return const Text('Error loading notifications');
                   } else if (snapshot.hasData && snapshot.data != null) {
-                    print(snapshot.data?.length);
                     return ListView.builder(
                       itemCount: snapshot.data?.length ?? 0,
                       itemBuilder: (context, index) {
                         final item = snapshot.data?[index];
-                        return ListTile(
-                          title: Text(item?['stop'] ?? 'Unnamed Stop'),
-                          subtitle: Text(item?['uuid'] ?? 'No ID'),
-                          onTap: () {
-                            // Handle tap on the notification
-                          },
+                        final timestamp = item?['timestamp'];
+                        final DateTime notificationTime =
+                            DateTime.fromMillisecondsSinceEpoch(timestamp);
+                        final Duration timeDifference =
+                            DateTime.now().difference(notificationTime);
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            elevation: 2,
+                            child: ExpansionTile(
+                                title: Text(item?['stop'] ?? 'Unnamed Stop',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                subtitle: Text(
+                                    'Il y a ${timeDifference.inMinutes} minutes'),
+                                leading: const Icon(
+                                    Icons.notification_important,
+                                    color: Colors.red),
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.teal[50],
+                                      borderRadius: const BorderRadius.vertical(
+                                        bottom: Radius.circular(15),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Voici les détails de l\'alerte $index. Vous pouvez ajouter ici toutes les informations complémentaires, comme l\'heure exacte de l\'alerte, le lieu, ou tout autre détail pertinent.',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                ]),
+                          ),
                         );
                       },
                     );

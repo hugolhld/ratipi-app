@@ -1,5 +1,6 @@
 import 'package:explore_fultter/components/ListAlert.dart';
 import 'package:explore_fultter/components/StopView.dart';
+import 'package:explore_fultter/components/StopView.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,7 +32,7 @@ class _ListItemState extends State<ListItem> {
     List<String>? favorites = prefs.getStringList('favorites') ?? [];
 
     setState(() {
-      isFavorite = favorites.contains(widget.title);
+      isFavorite = favorites.contains(widget.subtitle);
     });
   }
 
@@ -39,14 +40,16 @@ class _ListItemState extends State<ListItem> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? favorites = prefs.getStringList('favorites') ?? [];
 
-    String favoriteItem = widget.title;
+    String? favoriteItem = widget.subtitle;
+
+    print(widget.subtitle);
 
     setState(() {
       if (favorites.contains(favoriteItem)) {
         favorites.remove(favoriteItem);
         isFavorite = false;
       } else {
-        favorites.add(favoriteItem);
+        favorites.add(favoriteItem!);
         isFavorite = true;
       }
     });
@@ -83,7 +86,7 @@ class _ListItemState extends State<ListItem> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      ListAlert(title: widget.title, routeId: widget.subtitle),
+                      ListAlert(title: widget.title, routeId: widget.subtitle!),
                 ),
               );
             }
@@ -91,6 +94,7 @@ class _ListItemState extends State<ListItem> {
           child: ListTile(
             title: Text(
               widget.title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: widget.subtitle != null ? Text(widget.subtitle!) : null,
             leading: const Icon(Icons.directions_bus,
@@ -153,30 +157,3 @@ class _ListItemState extends State<ListItem> {
     );
   }
 }
-
-
-
-
-
-
-
-// ListTile(
-    //   title: Text(widget.title),
-    //   subtitle: widget.subtitle != null ? Text(widget.subtitle!) : null,
-    //   trailing: IconButton(
-    //     color: Colors.red,
-    //     onPressed: _toggleFavorite,
-    //     icon: Icon(
-    //       isFavorite ? Icons.favorite : Icons.favorite_border_outlined,
-    //     ),
-    //   ),
-    //   onTap: () {
-    //     Navigator.push(
-    //       context,
-    //       MaterialPageRoute(
-    //         builder: (context) =>
-    //             ListAlert(title: widget.title, routeId: widget.subtitle),
-    //       ),
-    //     );
-    //   },
-    // );
