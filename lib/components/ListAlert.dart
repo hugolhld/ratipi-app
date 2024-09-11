@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore_fultter/components/StopView.dart';
+import 'package:explore_fultter/utils/firebase.dart';
 import 'package:flutter/material.dart';
 
 class ListAlert extends StatefulWidget {
@@ -12,6 +14,18 @@ class ListAlert extends StatefulWidget {
 }
 
 class _ListAlertState extends State<ListAlert> {
+  // Use getNotificationsByStop to get notifications
+  Future<List<QueryDocumentSnapshot<Object?>>?> getNotifications() async {
+    try {
+      final QuerySnapshot notifications = await FirestoreService().getNotificationsByStop(widget.routeId!);
+      print(notifications.docs);
+      return notifications.docs;
+    } catch (e) {
+      print('Error getting notifications: $e');
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,13 +70,35 @@ class _ListAlertState extends State<ListAlert> {
               },
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Hello from Notif!',
-              style: TextStyle(fontSize: 24),
-            ),
-            const Text(
-              'Hello from Notif!',
-              style: TextStyle(fontSize: 24),
+            Expanded(
+              // Wrapping FutureBuilder with Expanded so the ListView doesn't overflow
+              child: FutureBuilder<List<QueryDocumentSnapshot<Object?>>?>(
+                future: getNotifications(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return const Text('Error loading notifications');
+                  } else if (snapshot.hasData && snapshot.data != null) {
+                    print(snapshot.data?.length);
+                    return ListView.builder(
+                      itemCount: snapshot.data?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        final item = snapshot.data?[index];
+                        return ListTile(
+                          title: Text(item?['stop'] ?? 'Unnamed Stop'),
+                          subtitle: Text(item?['uuid'] ?? 'No ID'),
+                          onTap: () {
+                            // Handle tap on the notification
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    return const Text('No notifications found');
+                  }
+                },
+              ),
             ),
           ],
         ),
