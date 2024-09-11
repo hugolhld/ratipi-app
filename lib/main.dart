@@ -1,7 +1,6 @@
-import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:explore_fultter/utils/firebase.dart';
+import 'package:explore_fultter/utils/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +15,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => NotificationProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -53,7 +57,7 @@ class _MyAppState extends State<MyApp> {
       await prefs.setString('userId', userId);
     }
 
-    // Fetch favorites once to avoid repeated async calls
+    // Récupérer les favoris pour éviter des appels répétés aux async
     _favorites = prefs.getStringList('favorites') ?? [];
 
     setState(() {
@@ -96,7 +100,6 @@ class _MyAppState extends State<MyApp> {
                           final alertData = data['alert'] ?? '';
                           final routeData = data['route'] ?? '';
 
-                          // Use FutureBuilder to handle async check
                           return FutureBuilder<bool>(
                             future: _checkIfFavorite(routeData),
                             builder: (context, favoriteSnapshot) {
@@ -108,15 +111,15 @@ class _MyAppState extends State<MyApp> {
                                     );
                                   });
                                 }
-                                return Container(); // Return an empty container if the route is a favorite
+                                return Container(); // Ne rien afficher si la route est dans les favoris
                               } else {
-                                return Container(); // Return an empty container while checking
+                                return Container(); // Retourner un conteneur vide pendant la vérification
                               }
                             },
                           );
                         }
 
-                        return Container(); // Return an empty container if no data
+                        return Container(); // Retourner un conteneur vide si aucune donnée
                       },
                     ),
                   ),
