@@ -68,12 +68,6 @@ class _MyAppState extends State<MyApp> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      if (index == 1) {
-        WebSocketManager().sendMessage({
-          'stop': 'greeting',
-          'uuid': 'Hello, World!',
-        });
-      }
     });
   }
 
