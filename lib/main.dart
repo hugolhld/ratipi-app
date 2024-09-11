@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:explore_fultter/utils/firebase.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,14 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // FirestoreService firestoreService = FirestoreService();
+  // QuerySnapshot dbData = (await firestoreService.getDocuments('/notifications')) as QuerySnapshot<Object?>;
+  // List<QueryDocumentSnapshot> docs = dbData.docs;
+  // if (docs.isNotEmpty) {
+  //   print(docs.first.data());
+  // }
+
   runApp(const MyApp());
 }
 

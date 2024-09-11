@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:explore_fultter/utils/firebase.dart';
 import 'package:explore_fultter/utils/web_socket_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -65,10 +66,22 @@ class _StopViewState extends State<StopView> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                WebSocketManager().sendMessage({
+
+                FirestoreService firestoreService = FirestoreService();
+                firestoreService.addDocument('notifications', {
                   'alert': 'controlleurs',
+                  'route': widget.stopTitle,
                   'stop': stop,
                   'uuid': uuid,
+                  'timestamp': DateTime.now().millisecondsSinceEpoch,
+                });
+
+                WebSocketManager().sendMessage({
+                  'alert': 'controlleurs',
+                  'route': widget.stopTitle,
+                  'stop': stop,
+                  'uuid': uuid,
+                  'timestamp': DateTime.now().millisecondsSinceEpoch,
                 } as Map<String, dynamic>);
 
               },
