@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "392607224274",
+    "project_id": "ratipi-app",
+    "storage_bucket": "ratipi-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392607224274:android:e3224f37db0dc312c3780b",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvMhfFognJsAO3fEMz5NS01morROtYFVU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
