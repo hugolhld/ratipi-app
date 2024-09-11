@@ -39,6 +39,20 @@ class FirestoreService {
     }
   }
 
+  // Get count of documents by route from notifications collection
+  Future<int> getNotificationsCountByRoute(String route) async {
+    try {
+      QuerySnapshot notifications = await _db.collection('notifications')
+            .where('route', isEqualTo: route)
+            .where('timestamp', isGreaterThan: DateTime.now().subtract(const Duration(minutes: 15)).millisecondsSinceEpoch)
+            .get();
+      return notifications.docs.length;
+    } catch (e) {
+      print('Error getting notifications count: $e');
+      rethrow;
+    }
+  }
+
   // Get all documents from a collection
   Future<QuerySnapshot> getDocuments(String collectionPath) async {
     return await _db.collection(collectionPath).get();
