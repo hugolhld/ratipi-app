@@ -1,9 +1,8 @@
-import 'dart:ffi';
-
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:explore_fultter/utils/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore_fultter/components/StopView.dart';
-import 'package:explore_fultter/utils/firebase.dart';
-import 'package:flutter/material.dart';
 
 class ListAlert extends StatefulWidget {
   final String title;
@@ -16,53 +15,41 @@ class ListAlert extends StatefulWidget {
 }
 
 class _ListAlertState extends State<ListAlert> {
-  // Use getNotificationsByStop to get notifications
-  Future<List<QueryDocumentSnapshot<Object?>>?> getNotifications() async {
-    try {
-      final QuerySnapshot notifications =
-          await FirestoreService().getNotificationsByStop(widget.routeId!);
-      print(notifications.docs);
-      return notifications.docs;
-    } catch (e) {
-      print('Error getting notifications: $e');
+  @override
+  void initState() {
+    super.initState();
+    // Fetch notifications when the widget is initialized
+    if (widget.routeId != null) {
+      Provider.of<NotificationProvider>(context, listen: false)
+          .fetchNotifications(widget.routeId!);
     }
-    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: Text(widget.title),
       ),
       body: Center(
         child: Column(
           children: [
-            const SizedBox(height: 20), // Espace au-dessus du bouton
+            const SizedBox(height: 20),
             ElevatedButton.icon(
-              icon: const Icon(Icons.add,
-                  color: Colors.white), // Icône avant le texte
-              label: const Text(
-                'Ajouter une alerte !',
-                style: TextStyle(color: Colors.white),
-              ),
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: const Text('Ajouter une alerte !', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal, // Couleur de fond du bouton
-                foregroundColor: Colors.white, // Couleur de l'icône et du texte
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // Coins arrondis
-                ),
-                elevation: 2, // Ombre du bouton pour un effet 3D
+                backgroundColor: Colors.teal,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                elevation: 2,
               ),
               onPressed: () {
                 if (widget.routeId != null) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          StopView(stopTitle: widget.routeId!),
+                      builder: (context) => StopView(stopTitle: widget.routeId!),
                     ),
                   );
                 } else {
@@ -74,18 +61,20 @@ class _ListAlertState extends State<ListAlert> {
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: FutureBuilder<List<QueryDocumentSnapshot<Object?>>?>(
-                future: getNotifications(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+              // Utiliser Consumer pour écouter les changements dans NotificationProvider
+              child: Consumer<NotificationProvider>(
+                builder: (context, notificationProvider, child) {
+                  if (notificationProvider.isLoading) {
                     return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
+                  } else if (notificationProvider.hasError) {
                     return const Text('Error loading notifications');
-                  } else if (snapshot.hasData && snapshot.data != null) {
+                  } else if (notificationProvider.notifications.isEmpty) {
+                    return const Text('No notifications found');
+                  } else {
                     return ListView.builder(
-                      itemCount: snapshot.data?.length ?? 0,
+                      itemCount: notificationProvider.notifications.length,
                       itemBuilder: (context, index) {
-                        final item = snapshot.data?[index];
+                        final item = notificationProvider.notifications[index];
                         final timestamp = item?['timestamp'];
                         final DateTime notificationTime =
                             DateTime.fromMillisecondsSinceEpoch(timestamp);
@@ -127,8 +116,6 @@ class _ListAlertState extends State<ListAlert> {
                         );
                       },
                     );
-                  } else {
-                    return const Text('No notifications found');
                   }
                 },
               ),

@@ -1,7 +1,6 @@
-import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:explore_fultter/utils/firebase.dart';
+import 'package:explore_fultter/utils/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +15,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => NotificationProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -53,7 +57,7 @@ class _MyAppState extends State<MyApp> {
       await prefs.setString('userId', userId);
     }
 
-    // Fetch favorites once to avoid repeated async calls
+    // Récupérer les favoris pour éviter des appels répétés aux async
     _favorites = prefs.getStringList('favorites') ?? [];
 
     setState(() {
@@ -89,41 +93,33 @@ class _MyAppState extends State<MyApp> {
                     child: StreamBuilder<Map>(
                       stream: WebSocketManager().messageStream,
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                                ConnectionState.active &&
-                            snapshot.hasData) {
+                        if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
                           final data = snapshot.data!;
                           final stopData = data['stop'] ?? '';
                           final uuidData = data['uuid'] ?? '';
                           final alertData = data['alert'] ?? '';
                           final routeData = data['route'] ?? '';
 
-                          // Use FutureBuilder to handle async check
                           return FutureBuilder<bool>(
                             future: _checkIfFavorite(routeData),
                             builder: (context, favoriteSnapshot) {
-                              if (favoriteSnapshot.connectionState ==
-                                      ConnectionState.done &&
-                                  favoriteSnapshot.hasData) {
+                              if (favoriteSnapshot.connectionState == ConnectionState.done && favoriteSnapshot.hasData) {
                                 if (favoriteSnapshot.data == true) {
-                                  WidgetsBinding.instance
-                                      .addPostFrameCallback((_) {
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              'Notification $alertData reçue: $stopData de $uuidData')),
+                                      SnackBar(content: Text('Notification $alertData reçue: $stopData de $uuidData')),
                                     );
                                   });
                                 }
-                                return Container(); // Return an empty container if the route is a favorite
+                                return Container(); // Ne rien afficher si la route est dans les favoris
                               } else {
-                                return Container(); // Return an empty container while checking
+                                return Container(); // Retourner un conteneur vide pendant la vérification
                               }
                             },
                           );
                         }
 
-                        return Container(); // Return an empty container if no data
+                        return Container(); // Retourner un conteneur vide si aucune donnée
                       },
                     ),
                   ),
