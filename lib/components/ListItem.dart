@@ -97,33 +97,53 @@ class _ListItemState extends State<ListItem> {
             subtitle: widget.subtitle != null ? Text(widget.subtitle!) : null,
             leading: const Icon(Icons.directions_bus,
                 color: Colors.teal), // Icône devant le texte
-            trailing: Stack(
-              clipBehavior:
-                  Clip.none, // Permet d'afficher le badge en dehors du Stack
+            trailing: Row(
+              mainAxisSize:
+                  MainAxisSize.min, // Minimise l'espace utilisé par le Row
               children: [
-                const Icon(Icons.notifications,
-                    color: Colors.teal), // Icône de notification
-                Positioned(
-                  right: -8, // Décale le badge à droite de l'icône
-                  top: -8, // Décale le badge vers le haut
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 20,
-                      minHeight: 20,
-                    ),
-                    child: const Text(
-                      '3', // Nombre de notifications (peut être dynamique)
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                Stack(
+                  clipBehavior: Clip
+                      .none, // Permet d'afficher le badge en dehors du Stack
+                  children: [
+                    const Icon(Icons.notifications,
+                        color: Colors.teal), // Icône de notification
+                    Positioned(
+                      right: -8, // Décale le badge à droite de l'icône
+                      top: -8, // Décale le badge vers le haut
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 20,
+                          minHeight: 20,
+                        ),
+                        child: const Text(
+                          '3', // Nombre de notifications (peut être dynamique)
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 8), // Espace entre les deux icônes
+                Transform.translate(
+                  offset: const Offset(0,
+                      -6), // Décale l'icône favori vers le haut (valeur négative pour déplacer vers le haut)
+                  child: IconButton(
+                    color: Colors.red,
+                    onPressed: _toggleFavorite,
+                    icon: Icon(
+                      isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border_outlined,
                     ),
                   ),
                 ),

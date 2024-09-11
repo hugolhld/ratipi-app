@@ -127,6 +127,15 @@ class _MyAppState extends State<MyApp> {
             : BottomNavigationBar(
                 currentIndex: _selectedIndex,
                 onTap: _onItemTapped,
+                selectedItemColor: Colors.teal,
+                unselectedItemColor: Colors.teal.withOpacity(0.6),
+                selectedLabelStyle: const TextStyle(
+                  color: Colors.teal,
+                  fontWeight: FontWeight.bold,
+                ),
+                unselectedLabelStyle: TextStyle(
+                  color: Colors.teal.withOpacity(0.6),
+                ),
                 items: const [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),
