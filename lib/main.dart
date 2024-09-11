@@ -16,13 +16,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // FirestoreService firestoreService = FirestoreService();
-  // QuerySnapshot dbData = (await firestoreService.getDocuments('/notifications')) as QuerySnapshot<Object?>;
-  // List<QueryDocumentSnapshot> docs = dbData.docs;
-  // if (docs.isNotEmpty) {
-  //   print(docs.first.data());
-  // }
-
   runApp(const MyApp());
 }
 
@@ -37,6 +30,7 @@ class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
   String? _userId;
   bool _isLoading = true;
+  List<String>? _favorites;
 
   static final List<Widget> _pages = <Widget>[
     const MyHomePage(),
@@ -59,6 +53,9 @@ class _MyAppState extends State<MyApp> {
       await prefs.setString('userId', userId);
     }
 
+    // Fetch favorites once to avoid repeated async calls
+    _favorites = prefs.getStringList('favorites') ?? [];
+
     setState(() {
       _userId = userId;
       _isLoading = false;
@@ -69,6 +66,10 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  Future<bool> _checkIfFavorite(String route) async {
+    return _favorites?.contains(route) ?? false;
   }
 
   @override
@@ -84,28 +85,38 @@ class _MyAppState extends State<MyApp> {
             : Stack(
                 children: [
                   _pages[_selectedIndex],
-                  // StreamBuilder for WebSocket messages
                   Positioned.fill(
                     child: StreamBuilder<Map>(
                       stream: WebSocketManager().messageStream,
                       builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          String stopData = snapshot.data!['stop'];
-                          String uuidData = snapshot.data!['uuid'];
-                          String alertData = snapshot.data!['alert'];
+                        if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
+                          final data = snapshot.data!;
+                          final stopData = data['stop'] ?? '';
+                          final uuidData = data['uuid'] ?? '';
+                          final alertData = data['alert'] ?? '';
+                          final routeData = data['route'] ?? '';
 
-                          // if(uuidData == _userId) {
-                          //   return Container(); // Return an empty container
-                          // }
-
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Notification $alertData reçue: $stopData de $uuidData')),
-                            );
-                          });
+                          // Use FutureBuilder to handle async check
+                          return FutureBuilder<bool>(
+                            future: _checkIfFavorite(routeData),
+                            builder: (context, favoriteSnapshot) {
+                              if (favoriteSnapshot.connectionState == ConnectionState.done && favoriteSnapshot.hasData) {
+                                if (favoriteSnapshot.data == true) {
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Notification $alertData reçue: $stopData de $uuidData')),
+                                    );
+                                  });
+                                }
+                                return Container(); // Return an empty container if the route is a favorite
+                              } else {
+                                return Container(); // Return an empty container while checking
+                              }
+                            },
+                          );
                         }
 
-                        return Container(); // Return an empty container
+                        return Container(); // Return an empty container if no data
                       },
                     ),
                   ),
@@ -116,6 +127,15 @@ class _MyAppState extends State<MyApp> {
             : BottomNavigationBar(
                 currentIndex: _selectedIndex,
                 onTap: _onItemTapped,
+                selectedItemColor: Colors.teal,
+                unselectedItemColor: Colors.teal.withOpacity(0.6),
+                selectedLabelStyle: const TextStyle(
+                  color: Colors.teal,
+                  fontWeight: FontWeight.bold,
+                ),
+                unselectedLabelStyle: TextStyle(
+                  color: Colors.teal.withOpacity(0.6),
+                ),
                 items: const [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),
