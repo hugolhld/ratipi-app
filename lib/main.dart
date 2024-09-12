@@ -1,6 +1,7 @@
 import 'package:explore_fultter/utils/local_notifications.dart';
 import 'package:explore_fultter/utils/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:explore_fultter/views/MyHomePage/MyHomePage.dart';
 import 'package:explore_fultter/views/NotificationsPage/NotificationPage.dart';
 
 void main() async {
+  await dotenv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -18,20 +20,14 @@ void main() async {
 
   LocalNotifications().initNotifications();
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => NotificationProvider(),
-        ),
-      ],
-      child: const MyApp(),
-    )
-      // ChangeNotifierProvider(
-      //   create: (context) => NotificationProvider(),
-      //   child: const MyApp(),
-      // ),
-      );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => NotificationProvider(),
+      ),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
