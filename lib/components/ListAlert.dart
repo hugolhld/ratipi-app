@@ -71,13 +71,18 @@ class _ListAlertState extends State<ListAlert> {
                     return const CircularProgressIndicator();
                   } else if (notificationProvider.hasError) {
                     return const Text('Error loading notifications');
-                  } else if (notificationProvider.getNotificationsForRoute(widget.routeId!).isEmpty) {
+                  } else if (notificationProvider
+                      .getNotificationsForRoute(widget.routeId!)
+                      .isEmpty) {
                     return const Text('No notifications found');
                   } else {
                     return ListView.builder(
-                      itemCount: notificationProvider.getNotificationsForRoute(widget.routeId!).length,
+                      itemCount: notificationProvider
+                          .getNotificationsForRoute(widget.routeId!)
+                          .length,
                       itemBuilder: (context, index) {
-                        final item = notificationProvider.getNotificationsForRoute(widget.routeId!)[index];
+                        final item = notificationProvider
+                            .getNotificationsForRoute(widget.routeId!)[index];
                         final timestamp = item?['timestamp'];
                         final DateTime notificationTime =
                             DateTime.fromMillisecondsSinceEpoch(timestamp);
@@ -88,7 +93,7 @@ class _ListAlertState extends State<ListAlert> {
                               horizontal: 16.0, vertical: 8.0),
                           child: Card(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             elevation: 2,
                             child: ExpansionTile(
@@ -124,17 +129,16 @@ class _ListAlertState extends State<ListAlert> {
                                       const SizedBox(
                                           height:
                                               8), // Espace entre le texte et l'heure
-                                      Text(
+                                      const Text(
                                         'Des contrôleurs ont été signalés à cet arrêt.',
-                                        style: const TextStyle(fontSize: 16),
+                                        style: TextStyle(fontSize: 16),
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
                                         'Heure signalée : ${DateFormat('HH:mm').format(notificationTime)}',
                                         style: const TextStyle(
                                           fontSize: 16,
-                                          fontWeight: FontWeight
-                                              .bold, // Heure signalée en gras
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ],
