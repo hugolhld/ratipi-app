@@ -1,16 +1,24 @@
-# explore_fultter
-
-A new Flutter project.
+# RATIPI APP
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### WebSocket Server
 
-A few resources to get you started if this is your first Flutter project:
+ - Create a web sockets server or go in foler web socket at root of project
+ - If you want start WS from project
+ - Run `npm i` in `/WS-server`
+ - Run `node index.js`
+ - That return a localhost ip
+ 
+ If you want have a public domain, you can install *localtunnel* with `npm install -g localtunnel`
+ - After just run `lt --port 8080` for expose your localhost
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Run App
+ - You need *Flutter SDK* installed on your machine
+ - At root of project
+ - Run `flutter pub get`
+ - You have now all dependency
+ - Check you have iOS or Android Simulator installed
+ - Start an emulator
+ - Run `flutter run`
+ - You should have app on emulator ! :tada:

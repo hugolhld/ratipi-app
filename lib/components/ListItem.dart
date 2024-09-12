@@ -26,8 +26,14 @@ class _ListItemState extends State<ListItem> {
   @override
   void initState() {
     super.initState();
-    _checkIfFavorite();
-    _getNotificationsCount();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkIfFavorite();
+      if (widget.subtitle != null) {
+        print(widget.subtitle);
+        Provider.of<NotificationProvider>(context, listen: false)
+            .fetchNotifications(widget.subtitle!);
+      }
+    });
   }
 
   Future<void> _checkIfFavorite() async {
@@ -66,18 +72,6 @@ class _ListItemState extends State<ListItem> {
               : '${widget.title} retiré des favoris.'),
         ),
       );
-    }
-  }
-
-  Future<void> _getNotificationsCount() async {
-    if (widget.subtitle != null) {
-      FirestoreService firestoreService = FirestoreService();
-      int count =
-          await firestoreService.getNotificationsCountByRoute(widget.subtitle!);
-
-      setState(() {
-        notificationsCount = count.toString();
-      });
     }
   }
 
@@ -121,32 +115,34 @@ class _ListItemState extends State<ListItem> {
                     Positioned(
                       right: -8,
                       top: -8,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: notificationsCount != '0'
-                            ? BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(12),
-                              )
-                            : null,
-                        constraints: const BoxConstraints(
-                          minWidth: 20,
-                          minHeight: 20,
-                        ),
-                        // child: Center(
-                        //   child: Consumer<NotificationProvider>(
-                        //     builder: (context, notificationsCount, child) {
-                        //       return Text(
-                        //         notificationsCount.getCountByRoute(widget.subtitle!) as String,
-                        //         style: const TextStyle(
-                        //           color: Colors.white,
-                        //           fontSize: 12,
-                        //         ),
-                        //       );
-                        //     },
-                            
-                        //   )
-                        // ),
+                      child: Consumer<NotificationProvider>(
+                        builder: (context, provider, child) {
+                          // Utilise la liste des notifications depuis le provider
+                          print(provider.getNotificationsForRoute(widget.subtitle!));
+                          return provider.getNotificationsForRoute(widget.subtitle!)
+                                  .isNotEmpty
+                              ? Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    minWidth: 20,
+                                    minHeight: 20,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      provider.getNotificationsForRoute(widget.subtitle!).length.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink();
+                        },
                       ),
                     ),
                   ],
