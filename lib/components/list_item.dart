@@ -1,4 +1,4 @@
-import 'package:explore_fultter/components/ListAlert.dart';
+import 'package:explore_fultter/components/list_alert.dart';
 import 'package:explore_fultter/utils/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

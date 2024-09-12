@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:explore_fultter/utils/web_socket_manager.dart';
-import 'package:explore_fultter/views/MyHomePage/MyHomePage.dart';
-import 'package:explore_fultter/views/NotificationsPage/NotificationPage.dart';
+import 'package:explore_fultter/views/MyHomePage/home_view.dart';
+import 'package:explore_fultter/views/NotificationsPage/notifications_view.dart';
 
 void main() async {
   await dotenv.load(fileName: '.env');

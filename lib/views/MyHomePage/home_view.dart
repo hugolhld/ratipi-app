@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:explore_fultter/components/ListItem.dart';
+import 'package:explore_fultter/components/list_item.dart';
 import 'package:flutter/services.dart';
 
 class MyHomePage extends StatefulWidget {
