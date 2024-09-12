@@ -7,10 +7,9 @@ import 'package:web_socket_channel/status.dart' as status;
 
 class WebSocketManager {
   static final WebSocketManager _instance = WebSocketManager._internal();
-  late WebSocketChannel _channel;
+  WebSocketChannel? _channel;
   final String _serverUrl = dotenv.env['WEBSOCKET_URL'] ?? 'ws://localhost:8080';
-  // final String _serverUrl = 'ws://localhost:8080';
-  final StreamController<Map<String, dynamic>> _streamController = StreamController<Map<String, dynamic>>.broadcast();  // Utilisation de broadcast
+  final StreamController<Map<String, dynamic>> _streamController = StreamController<Map<String, dynamic>>.broadcast();
 
   factory WebSocketManager() {
     return _instance;
@@ -18,10 +17,17 @@ class WebSocketManager {
 
   WebSocketManager._internal();
 
+  bool get isConnected => _channel != null;
+
   void connect() {
+    if (_channel != null) {
+      print("Already connected");
+      return;
+    }
+    
     _channel = WebSocketChannel.connect(Uri.parse(_serverUrl));
 
-    _channel.stream.listen(
+    _channel!.stream.listen(
       (message) {
         String messageData;
 
@@ -50,11 +56,21 @@ class WebSocketManager {
   Stream<Map<String, dynamic>> get messageStream => _streamController.stream;
 
   void sendMessage(Map<String, dynamic> message) {
+    if (_channel == null) {
+      print("WebSocket not connected");
+      return;
+    }
+
     String jsonString = jsonEncode(message);
-    _channel.sink.add(jsonString);
+    _channel!.sink.add(jsonString);
   }
 
   void _reconnect() {
+    if (_channel != null) {
+      _channel!.sink.close(status.goingAway);
+      _channel = null;
+    }
+
     Future.delayed(const Duration(seconds: 5), () {
       print("Reconnexion au serveur WebSocket...");
       connect();
@@ -62,7 +78,10 @@ class WebSocketManager {
   }
 
   void disconnect() {
-    _channel.sink.close(status.goingAway);
+    if (_channel != null) {
+      _channel!.sink.close(status.goingAway); // Use status.goingAway (1001) for valid close code
+      _channel = null;
+    }
     _streamController.close();
   }
 }

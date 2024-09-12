@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:explore_fultter/utils/local_notifications.dart';
 import 'package:explore_fultter/utils/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -37,11 +38,13 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   int _selectedIndex = 0;
   String? _userId;
   bool _isLoading = true;
   List<String>? _favorites;
+  late WebSocketManager _webSocketManager;
+  late StreamSubscription<Map> _webSocketSubscription;
 
   static final List<Widget> _pages = <Widget>[
     const MyHomePage(),
@@ -51,8 +54,13 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _webSocketManager = WebSocketManager();
     _initializeUUID();
-    WebSocketManager().connect();
+    // Connect to WebSocket after initialization is complete
+    Future.microtask(() {
+      _connectToWebSocket();
+    });
   }
 
   Future<void> _initializeUUID() async {
@@ -72,14 +80,67 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  void _connectToWebSocket() {
+    // Ensure WebSocketManager is initialized before connecting
+    if (!_webSocketManager.isConnected) {
+      _webSocketSubscription = _webSocketManager.messageStream.listen((message) {
+        _handleWebSocketMessage(message);
+      });
+      _webSocketManager.connect();
+    }
+  }
+
+  void _handleWebSocketMessage(Map<String, dynamic> message) async {
+    final stopData = message['stop'] ?? '';
+    final uuidData = message['uuid'] ?? '';
+    final alertData = message['alert'] ?? '';
+    final routeData = message['route'] ?? '';
+
+    final isFavorite = await _checkIfFavorite(routeData);
+    if (isFavorite) {
+      LocalNotifications().showNotification(
+        title: 'Alerte $alertData reçue',
+        body: 'Notification $alertData reçue: $stopData sur la ligne $routeData',
+      );
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Notification $alertData reçue: $stopData de $uuidData')),
+        );
+      });
+    }
   }
 
   Future<bool> _checkIfFavorite(String route) async {
     return _favorites?.contains(route) ?? false;
+  }
+
+  void _disconnectFromWebSocket() {
+    _webSocketSubscription.cancel();
+    _webSocketManager.disconnect();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      print('App paused');
+      _disconnectFromWebSocket();
+    } else if (state == AppLifecycleState.resumed) {
+      print('App resumed');
+      if (!_webSocketManager.isConnected) {
+        _connectToWebSocket();
+      }
+    } else if (state == AppLifecycleState.inactive || state == AppLifecycleState.detached) {
+      _disconnectFromWebSocket();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _disconnectFromWebSocket();
+    super.dispose();
   }
 
   @override
@@ -96,59 +157,13 @@ class _MyAppState extends State<MyApp> {
             : Stack(
                 children: [
                   _pages[_selectedIndex],
-                  Positioned.fill(
-                    child: StreamBuilder<Map>(
-                      stream: WebSocketManager().messageStream,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                                ConnectionState.active &&
-                            snapshot.hasData) {
-                          final data = snapshot.data!;
-                          final stopData = data['stop'] ?? '';
-                          final uuidData = data['uuid'] ?? '';
-                          final alertData = data['alert'] ?? '';
-                          final routeData = data['route'] ?? '';
-
-                          return FutureBuilder<bool>(
-                            future: _checkIfFavorite(routeData),
-                            builder: (context, favoriteSnapshot) {
-                              if (favoriteSnapshot.connectionState ==
-                                      ConnectionState.done &&
-                                  favoriteSnapshot.hasData) {
-                                if (favoriteSnapshot.data == true) {
-                                  LocalNotifications().showNotification(
-                                    title: 'Alerte $alertData reçue',
-                                    body:
-                                        'Notification $alertData reçue: $stopData sur la ligne $routeData',
-                                  );
-
-                                  WidgetsBinding.instance
-                                      .addPostFrameCallback((_) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              'Notification $alertData reçue: $stopData de $uuidData')),
-                                    );
-                                  });
-                                }
-                                return Container();
-                              } else {
-                                return Container();
-                              }
-                            },
-                          );
-                        }
-                        return Container();
-                      },
-                    ),
-                  ),
                 ],
               ),
         bottomNavigationBar: _isLoading
             ? null
             : BottomNavigationBar(
                 currentIndex: _selectedIndex,
-                onTap: _onItemTapped,
+                onTap: (index) => setState(() => _selectedIndex = index),
                 selectedItemColor: Colors.teal,
                 unselectedItemColor: Colors.teal.withOpacity(0.6),
                 selectedLabelStyle: const TextStyle(
@@ -172,4 +187,43 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
+  @override
+  void didChangeAccessibilityFeatures() {}
+
+  @override
+  void didChangeLocales(List<Locale>? locales) {}
+
+  @override
+  void didChangeMetrics() {}
+
+  @override
+  void didChangePlatformBrightness() {}
+
+  @override
+  void didChangeTextScaleFactor() {}
+
+  @override
+  void didHaveMemoryPressure() {}
+
+  @override
+  Future<bool> didPopRoute() async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> didPushRoute(String route) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> didPushRouteInformation(RouteInformation routeInformation) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  void handleCancelBackGesture() {}
+
+  @override
+  void handleCommitBackGesture() {}
 }
