@@ -28,19 +28,6 @@ void main() async {
     ],
     child: const MyApp(),
   ));
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(
-        create: (context) => NotificationProvider(),
-      ),
-    ],
-    child: const MyApp(),
-  )
-      // ChangeNotifierProvider(
-      //   create: (context) => NotificationProvider(),
-      //   child: const MyApp(),
-      // ),
-      );
 }
 
 class MyApp extends StatefulWidget {

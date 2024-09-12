@@ -106,7 +106,7 @@ class _ListAlertState extends State<ListAlert> {
                       itemBuilder: (context, index) {
                         final item = notificationProvider
                             .getNotificationsForRoute(widget.routeId!)[index];
-                        final timestamp = item?['timestamp'];
+                        final timestamp = item['timestamp'];
                         final DateTime notificationTime =
                             DateTime.fromMillisecondsSinceEpoch(timestamp);
                         final Duration timeDifference =
@@ -120,7 +120,7 @@ class _ListAlertState extends State<ListAlert> {
                             ),
                             elevation: 2,
                             child: ExpansionTile(
-                              title: Text(item?['stop'] ?? 'Unnamed Stop'),
+                              title: Text(item['stop'] ?? 'Unnamed Stop'),
                               subtitle: Text(
                                   'Il y a ${timeDifference.inMinutes} minutes'),
                               leading: const Icon(Icons.notification_important,

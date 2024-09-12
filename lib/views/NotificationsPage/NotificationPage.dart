@@ -36,6 +36,8 @@ class _NotificationPageState extends State<NotificationPage> {
           }
 
           final notifications = provider.allNotifications;
+          // Sort notifications by timestamp
+          notifications.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
 
           if (notifications.isEmpty) {
             return const Center(child: Text('No notifications available.'));
@@ -45,6 +47,12 @@ class _NotificationPageState extends State<NotificationPage> {
             itemCount: notifications.length,
             itemBuilder: (context, index) {
               final notification = notifications[index];
+              // Check how mmuch time has passed since the notification was created fromMillisecondsSinceEpoch
+              final timePassed = DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(notification['timestamp']));
+              final timePassedString = timePassed.inMinutes > 0
+                  ? '${timePassed.inMinutes} minute${timePassed.inMinutes > 1 ? 's' : ''}'
+                  : 'moins d\'une minute';
+                
               return Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -56,12 +64,12 @@ class _NotificationPageState extends State<NotificationPage> {
                   child: ListTile(
                     leading: const Icon(Icons.warning_amber_rounded,
                         color: Colors.red), // Icône d'alerte
-                    title: Text('Stop: ${notification['stop']}',
+                    title: Text("Ligne ${notification['route']} à l'arrêt ${notification['stop']}",
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold, // Texte en gras
                         )),
-                    subtitle: Text('Route ${notification['route']}'),
+                    subtitle: Text('Il y a $timePassedString'),
                     // trailing: const Icon(Icons.arrow_forward_ios), // Icône à droite
                     // onTap: () {
                     //   // Action lorsqu'on appuie sur une notification

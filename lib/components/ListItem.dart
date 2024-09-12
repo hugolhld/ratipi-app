@@ -1,5 +1,4 @@
 import 'package:explore_fultter/components/ListAlert.dart';
-import 'package:explore_fultter/utils/firebase.dart';
 import 'package:explore_fultter/utils/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +28,6 @@ class _ListItemState extends State<ListItem> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkIfFavorite();
       if (widget.subtitle != null) {
-        print(widget.subtitle);
         Provider.of<NotificationProvider>(context, listen: false)
             .fetchNotifications(widget.subtitle!);
       }
@@ -102,7 +100,7 @@ class _ListItemState extends State<ListItem> {
               widget.title,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: widget.subtitle != null ? Text(widget.subtitle!) : null,
+            // subtitle: widget.subtitle != null ? Text(widget.subtitle!) : null,
             leading: const Icon(Icons.directions_bus, color: Colors.teal),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -117,8 +115,6 @@ class _ListItemState extends State<ListItem> {
                       top: -8,
                       child: Consumer<NotificationProvider>(
                         builder: (context, provider, child) {
-                          // Utilise la liste des notifications depuis le provider
-                          print(provider.getNotificationsForRoute(widget.subtitle!));
                           return provider.getNotificationsForRoute(widget.subtitle!)
                                   .isNotEmpty
                               ? Container(
