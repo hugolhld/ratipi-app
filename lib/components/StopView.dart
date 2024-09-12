@@ -84,6 +84,7 @@ class _StopViewState extends State<StopView> {
                   'timestamp': DateTime.now().millisecondsSinceEpoch,
                 } as Map<String, dynamic>);
 
+                Navigator.pop(context);
               },
               child: const Text('Ajouter une alerte'),
             ),

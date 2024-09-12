@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     final routeData = message['route'] ?? '';
 
     final isFavorite = await _checkIfFavorite(routeData);
-    if (isFavorite) {
+    if (isFavorite && stopData.isNotEmpty /* && uuidData == _userId */) {
       LocalNotifications().showNotification(
         title: 'Alerte $alertData reçue',
         body: 'Notification $alertData reçue: $stopData sur la ligne $routeData',
@@ -122,18 +122,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused) {
-      print('App paused');
-      _disconnectFromWebSocket();
-    } else if (state == AppLifecycleState.resumed) {
-      print('App resumed');
-      if (!_webSocketManager.isConnected) {
-        _connectToWebSocket();
-      }
-    } else if (state == AppLifecycleState.inactive || state == AppLifecycleState.detached) {
-      _disconnectFromWebSocket();
-    }
+    _connectToWebSocket();
   }
 
   @override
