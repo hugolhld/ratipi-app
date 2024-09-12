@@ -63,7 +63,30 @@ class _ListAlertState extends State<ListAlert> {
                 }
               },
             ),
-            const SizedBox(height: 20),
+
+            const SizedBox(height: 15),
+            // Texte stylisé "Alerte en cours"
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.warning,
+                  color: Colors.red,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Alerte en cours',
+                  style: TextStyle(
+                    color: Colors.red[800],
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 15),
             Expanded(
               child: Consumer<NotificationProvider>(
                 builder: (context, notificationProvider, child) {
