@@ -1,3 +1,5 @@
+import 'package:explore_fultter/utils/firebase_messaging.dart';
+import 'package:explore_fultter/utils/local_notifications.dart';
 import 'package:explore_fultter/utils/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +16,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // await FirebaseMessage().initNotifications();
+
+  LocalNotifications().initNotifications();
 
   runApp(
     ChangeNotifierProvider(
@@ -67,6 +73,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _onItemTapped(int index) {
+
+    LocalNotifications().showNotification(
+      title: 'Hello, World!',
+      body: 'This is a notification from Flutter!',
+    );
+
     setState(() {
       _selectedIndex = index;
     });
@@ -105,6 +117,12 @@ class _MyAppState extends State<MyApp> {
                             builder: (context, favoriteSnapshot) {
                               if (favoriteSnapshot.connectionState == ConnectionState.done && favoriteSnapshot.hasData) {
                                 if (favoriteSnapshot.data == true) {
+
+                                  LocalNotifications().showNotification(
+                                    title: 'Alerte $alertData reçue',
+                                    body: 'Notification $alertData reçue: $stopData sur la ligne $routeData',
+                                  );
+
                                   WidgetsBinding.instance.addPostFrameCallback((_) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: Text('Notification $alertData reçue: $stopData de $uuidData')),
