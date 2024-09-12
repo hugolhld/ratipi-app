@@ -46,8 +46,8 @@ class _NotificationPageState extends State<NotificationPage> {
             itemBuilder: (context, index) {
               final notification = notifications[index];
               return ListTile(
-                title: Text('Stop: ${notification['stop']}'),
-                subtitle: Text('Route ${notification['route']}'),
+                title: Text('Arrêt: ${notification['stop']}'),
+                subtitle: Text('Ligne ${notification['route']}'),
               );
             },
           );
