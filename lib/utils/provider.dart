@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:explore_fultter/utils/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +9,7 @@ class NotificationProvider with ChangeNotifier {
   final Map<String, List<Map<String, dynamic>>> _notificationsByRoute = {};
   bool _isLoading = false;
   bool _hasError = false;
+  late Timer _cleanupTimer;
 
   List<Map<String, dynamic>> getNotificationsForRoute(String routeId) {
     return _notificationsByRoute[routeId] ?? [];
@@ -19,6 +22,10 @@ class NotificationProvider with ChangeNotifier {
     // Initialiser l'écouteur WebSocket dès la création du provider
     WebSocketManager().messageStream.listen((message) {
       _addNotification(message);
+    });
+
+    _cleanupTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _cleanupNotifications();
     });
   }
 
@@ -47,6 +54,32 @@ class NotificationProvider with ChangeNotifier {
     } else {
       _notificationsByRoute[routeId] = [newNotification];
     }
+    notifyListeners(); // Informe les listeners que la liste des notifications a changé
+  }
+
+  void _cleanupNotifications() {
+    final now = DateTime.now();
+    final fifteenMinutesAgo = now.subtract(const Duration(minutes: 15));
+
+    _notificationsByRoute.forEach((routeId, notifications) {
+      _notificationsByRoute[routeId] = notifications
+          .where((notification) {
+            final timestamp = notification['timestamp'];
+            DateTime? notificationTime;
+
+            if (timestamp is Timestamp) {
+              notificationTime = timestamp.toDate();
+            } else if (timestamp is int) {
+              notificationTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+            } else if (timestamp is DateTime) {
+              notificationTime = timestamp;
+            } else {
+              return false;
+            }
+            return notificationTime.isAfter(fifteenMinutesAgo);
+          }).toList();
+    });
+
     notifyListeners(); // Informe les listeners que la liste des notifications a changé
   }
 
