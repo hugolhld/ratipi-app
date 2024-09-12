@@ -7,7 +7,7 @@ import 'package:web_socket_channel/status.dart' as status;
 class WebSocketManager {
   static final WebSocketManager _instance = WebSocketManager._internal();
   late WebSocketChannel _channel;
-  final String _serverUrl = 'ws://stupid-hotels-visit.loca.lt'; // Remplace par ton URL WebSocket
+  final String _serverUrl = 'ws://eleven-taxes-check.loca.lt';
   final StreamController<Map<String, dynamic>> _streamController = StreamController<Map<String, dynamic>>.broadcast();  // Utilisation de broadcast
 
   factory WebSocketManager() {

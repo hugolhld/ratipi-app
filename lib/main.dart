@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
 
   static final List<Widget> _pages = <Widget>[
     const MyHomePage(),
-    const Notificationpage(),
+    const NotificationPage(),
   ];
 
   @override
@@ -77,11 +77,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _onItemTapped(int index) {
-    LocalNotifications().showNotification(
-      title: 'Hello, World!',
-      body: 'This is a notification from Flutter!',
-    );
-
     setState(() {
       _selectedIndex = index;
     });

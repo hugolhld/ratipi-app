@@ -7,6 +7,8 @@ import 'package:explore_fultter/utils/web_socket_manager.dart';
 
 class NotificationProvider with ChangeNotifier {
   final Map<String, List<Map<String, dynamic>>> _notificationsByRoute = {};
+  List<Map<String, dynamic>> _notifications = [];
+
   bool _isLoading = false;
   bool _hasError = false;
   late Timer _cleanupTimer;
@@ -14,6 +16,8 @@ class NotificationProvider with ChangeNotifier {
   List<Map<String, dynamic>> getNotificationsForRoute(String routeId) {
     return _notificationsByRoute[routeId] ?? [];
   }
+
+  List<Map<String, dynamic>> get allNotifications => _notifications;
 
   bool get isLoading => _isLoading;
   bool get hasError => _hasError;
@@ -37,6 +41,20 @@ class NotificationProvider with ChangeNotifier {
       final QuerySnapshot notifications = await FirestoreService().getNotificationsByStop(routeId);
       _notificationsByRoute[routeId] = notifications.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
       print('Fetched ${notifications.docs.length} notifications for route $routeId');
+    } catch (e) {
+      _setErrorState(true);
+      print('Error fetching notifications: $e');
+    } finally {
+      _setLoadingState(false);
+    }
+  }
+
+  Future<void> fetchAllNotification() async {
+    _setLoadingState(true);
+
+    try {
+      final QuerySnapshot notifications = await FirestoreService().getAllNotifications();
+      _notifications = notifications.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
     } catch (e) {
       _setErrorState(true);
       print('Error fetching notifications: $e');
