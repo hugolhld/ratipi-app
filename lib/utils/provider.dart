@@ -1,9 +1,8 @@
 import 'dart:async';
-
-import 'package:explore_fultter/utils/firebase.dart';
+import 'package:ratipi/utils/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:explore_fultter/utils/web_socket_manager.dart';
+import 'package:ratipi/utils/web_socket_manager.dart';
 
 class NotificationProvider with ChangeNotifier {
   final Map<String, List<Map<String, dynamic>>> _notificationsByRoute = {};
@@ -14,7 +13,12 @@ class NotificationProvider with ChangeNotifier {
   late Timer _cleanupTimer;
 
   List<Map<String, dynamic>> getNotificationsForRoute(String routeId) {
-    return _notificationsByRoute[routeId] ?? [];
+    final notifications = _notificationsByRoute[routeId];
+    if (notifications != null) {
+      notifications.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+      return notifications;
+    }
+    return [];
   }
 
   List<Map<String, dynamic>> get allNotifications => _notifications;
@@ -38,9 +42,11 @@ class NotificationProvider with ChangeNotifier {
     _setLoadingState(true);
 
     try {
-      final QuerySnapshot notifications = await FirestoreService().getNotificationsByStop(routeId);
-      _notificationsByRoute[routeId] = notifications.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-      print('Fetched ${notifications.docs.length} notifications for route $routeId');
+      final QuerySnapshot notifications =
+          await FirestoreService().getNotificationsByStop(routeId);
+      _notificationsByRoute[routeId] = notifications.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
     } catch (e) {
       _setErrorState(true);
       print('Error fetching notifications: $e');
@@ -53,8 +59,11 @@ class NotificationProvider with ChangeNotifier {
     _setLoadingState(true);
 
     try {
-      final QuerySnapshot notifications = await FirestoreService().getAllNotifications();
-      _notifications = notifications.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+      final QuerySnapshot notifications =
+          await FirestoreService().getAllNotifications();
+      _notifications = notifications.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
     } catch (e) {
       _setErrorState(true);
       print('Error fetching notifications: $e');
@@ -65,8 +74,8 @@ class NotificationProvider with ChangeNotifier {
 
   // Fonction appelée lorsque de nouvelles notifications arrivent via WebSocket
   void _addNotification(Map<String, dynamic> newNotification) {
-    print(newNotification);
-    String routeId = newNotification['route']; // Assumes each notification has a 'routeId' field
+    String routeId = newNotification[
+        'route']; // Assumes each notification has a 'routeId' field
     if (_notificationsByRoute.containsKey(routeId)) {
       _notificationsByRoute[routeId]!.add(newNotification);
     } else {
@@ -80,22 +89,21 @@ class NotificationProvider with ChangeNotifier {
     final fifteenMinutesAgo = now.subtract(const Duration(minutes: 15));
 
     _notificationsByRoute.forEach((routeId, notifications) {
-      _notificationsByRoute[routeId] = notifications
-          .where((notification) {
-            final timestamp = notification['timestamp'];
-            DateTime? notificationTime;
+      _notificationsByRoute[routeId] = notifications.where((notification) {
+        final timestamp = notification['timestamp'];
+        DateTime? notificationTime;
 
-            if (timestamp is Timestamp) {
-              notificationTime = timestamp.toDate();
-            } else if (timestamp is int) {
-              notificationTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-            } else if (timestamp is DateTime) {
-              notificationTime = timestamp;
-            } else {
-              return false;
-            }
-            return notificationTime.isAfter(fifteenMinutesAgo);
-          }).toList();
+        if (timestamp is Timestamp) {
+          notificationTime = timestamp.toDate();
+        } else if (timestamp is int) {
+          notificationTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+        } else if (timestamp is DateTime) {
+          notificationTime = timestamp;
+        } else {
+          return false;
+        }
+        return notificationTime.isAfter(fifteenMinutesAgo);
+      }).toList();
     });
 
     notifyListeners();

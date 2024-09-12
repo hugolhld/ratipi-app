@@ -1,15 +1,17 @@
 import 'dart:convert';
-import 'package:explore_fultter/utils/firebase.dart';
-import 'package:explore_fultter/utils/web_socket_manager.dart';
+import 'package:ratipi/utils/firebase.dart';
+import 'package:ratipi/utils/web_socket_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StopView extends StatefulWidget {
   final String stopTitle;
+  final String mode;
 
   const StopView({
     required this.stopTitle,
+    required this.mode,
     super.key,
   });
 
@@ -18,7 +20,7 @@ class StopView extends StatefulWidget {
 }
 
 class _StopViewState extends State<StopView> {
-  List<Map<String, dynamic>> _filteredData = [];
+  Map<String, List<Map<String, dynamic>>> _groupedData = {};
 
   @override
   void initState() {
@@ -33,14 +35,31 @@ class _StopViewState extends State<StopView> {
 
       final List<Map<String, dynamic>> filteredData = data
           .map((item) => item['fields'] as Map<String, dynamic>)
-          .where((fields) => fields['mode'] == 'Metro' && fields['route_long_name'] == widget.stopTitle)
+          .where((fields) => fields['mode'] == widget.mode && fields['route_long_name'] == widget.stopTitle)
           .toList();
 
-      setState(() {
-        _filteredData = filteredData;
+      // Sort the filtered data by stop_name in alphabetical order
+      filteredData.sort((a, b) {
+        final nameA = a['stop_name']?.toLowerCase() ?? '';
+        final nameB = b['stop_name']?.toLowerCase() ?? '';
+        return nameA.compareTo(nameB);
       });
 
-      print(filteredData);
+      // Group data by route_long_name
+      final Map<String, List<Map<String, dynamic>>> groupedData = {};
+      for (var item in filteredData) {
+        final route = item['route_long_name'] ?? 'Unknown Route';
+        if (groupedData[route] == null) {
+          groupedData[route] = [];
+        }
+        groupedData[route]!.add(item);
+      }
+
+      setState(() {
+        _groupedData = groupedData;
+      });
+
+      print(groupedData);
     } catch (e) {
       print('Error loading asset: $e');
     }
@@ -84,6 +103,7 @@ class _StopViewState extends State<StopView> {
                   'timestamp': DateTime.now().millisecondsSinceEpoch,
                 } as Map<String, dynamic>);
 
+                Navigator.pop(context);
               },
               child: const Text('Ajouter une alerte'),
             ),
@@ -97,26 +117,39 @@ class _StopViewState extends State<StopView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Stops for ${widget.stopTitle}'),
+        title: Text('Arrêts de la ligne ${widget.stopTitle}'),
       ),
-      // padding: const EdgeInsets.all(8.0),
-      body: Expanded(
-        child: _filteredData.isEmpty
-          ? const Text('No data available')
-          : ListView.builder(
-              itemCount: _filteredData.length,
-              itemBuilder: (context, index) {
-                final item = _filteredData[index];
-                return ListTile(
-                  title: Text(item['stop_name'] ?? 'Unnamed Stop'),
-                  subtitle: Text(item['stop_id'] ?? 'No ID'),
-                  onTap: () {
-                    _showAlert('Vous avez séléctionné ${item['stop_name']}', item['stop_name']);
-                  },
-                );
-              },
-            ),
-      ),
+      body: _groupedData.isEmpty
+        ? const Center(child: Text('No data available'))
+        : ListView.builder(
+            itemCount: _groupedData.keys.length,
+            itemBuilder: (context, index) {
+              final route = _groupedData.keys.elementAt(index);
+              final stops = _groupedData[route]!;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ...stops.map((item) {
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(item['stop_name'] ?? 'Unnamed Stop'),
+                          onTap: () {
+                            _showAlert('Vous avez séléctionné ${item['stop_name']}', item['stop_name']);
+                          },
+                        ),
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 1.0,
+                        ),
+                      ],
+                    );
+                  }),
+                ],
+              );
+            },
+          ),
     );
   }
 }

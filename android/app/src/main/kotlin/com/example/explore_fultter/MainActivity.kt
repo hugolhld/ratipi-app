@@ -1,4 +1,4 @@
-package com.example.explore_fultter
+package com.example.ratipi
 
 import io.flutter.embedding.android.FlutterActivity
 

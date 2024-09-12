@@ -1,4 +1,4 @@
-import 'package:explore_fultter/main.dart';
+import 'package:ratipi/main.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';

@@ -1,16 +1,18 @@
-import 'package:explore_fultter/components/ListAlert.dart';
-import 'package:explore_fultter/utils/provider.dart';
+import 'package:ratipi/components/list_alert.dart';
+import 'package:ratipi/utils/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ListItem extends StatefulWidget {
   final String title;
-  final String? subtitle;
+  final String subtitle;
+  final String mode;
 
   const ListItem({
     required this.title,
-    this.subtitle,
+    required this.mode,
+    required this.subtitle,
     super.key,
   });
 
@@ -27,10 +29,8 @@ class _ListItemState extends State<ListItem> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkIfFavorite();
-      if (widget.subtitle != null) {
-        Provider.of<NotificationProvider>(context, listen: false)
-            .fetchNotifications(widget.subtitle!);
-      }
+      Provider.of<NotificationProvider>(context, listen: false)
+          .fetchNotifications(widget.subtitle);
     });
   }
 
@@ -39,8 +39,7 @@ class _ListItemState extends State<ListItem> {
     List<String>? favorites = prefs.getStringList('favorites') ?? [];
 
     setState(() {
-      isFavorite =
-          widget.subtitle != null && favorites.contains(widget.subtitle);
+      isFavorite = favorites.contains(widget.subtitle);
     });
   }
 
@@ -50,27 +49,25 @@ class _ListItemState extends State<ListItem> {
 
     String? favoriteItem = widget.subtitle;
 
-    if (favoriteItem != null) {
-      setState(() {
-        if (favorites.contains(favoriteItem)) {
-          favorites.remove(favoriteItem);
-          isFavorite = false;
-        } else {
-          favorites.add(favoriteItem);
-          isFavorite = true;
-        }
-      });
+    setState(() {
+      if (favorites.contains(favoriteItem)) {
+        favorites.remove(favoriteItem);
+        isFavorite = false;
+      } else {
+        favorites.add(favoriteItem);
+        isFavorite = true;
+      }
+    });
 
-      await prefs.setStringList('favorites', favorites);
+    await prefs.setStringList('favorites', favorites);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(isFavorite
-              ? '${widget.title} ajouté aux favoris.'
-              : '${widget.title} retiré des favoris.'),
-        ),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(isFavorite
+            ? '${widget.title} ajouté aux favoris.'
+            : '${widget.title} retiré des favoris.'),
+      ),
+    );
   }
 
   @override
@@ -85,15 +82,15 @@ class _ListItemState extends State<ListItem> {
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: () {
-            if (widget.subtitle != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ListAlert(title: widget.title, routeId: widget.subtitle!),
-                ),
-              );
-            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ListAlert(
+                    title: widget.title,
+                    routeId: widget.subtitle,
+                    mode: widget.mode),
+              ),
+            );
           },
           child: ListTile(
             title: Text(
@@ -115,7 +112,8 @@ class _ListItemState extends State<ListItem> {
                       top: -8,
                       child: Consumer<NotificationProvider>(
                         builder: (context, provider, child) {
-                          return provider.getNotificationsForRoute(widget.subtitle!)
+                          return provider
+                                  .getNotificationsForRoute(widget.subtitle)
                                   .isNotEmpty
                               ? Container(
                                   padding: const EdgeInsets.all(2),
@@ -129,7 +127,11 @@ class _ListItemState extends State<ListItem> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      provider.getNotificationsForRoute(widget.subtitle!).length.toString(),
+                                      provider
+                                          .getNotificationsForRoute(
+                                              widget.subtitle)
+                                          .length
+                                          .toString(),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
