@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:explore_fultter/utils/provider.dart';
-import 'package:explore_fultter/components/StopView.dart';
+import 'package:explore_fultter/components/stop_view.dart';
 import 'package:intl/intl.dart';
 
 class ListAlert extends StatefulWidget {
