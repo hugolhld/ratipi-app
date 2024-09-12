@@ -135,7 +135,6 @@ class _StopViewState extends State<StopView> {
                       children: [
                         ListTile(
                           title: Text(item['stop_name'] ?? 'Unnamed Stop'),
-                          subtitle: Text(item['stop_id'] ?? 'No ID'),
                           onTap: () {
                             _showAlert('Vous avez séléctionné ${item['stop_name']}', item['stop_name']);
                           },
