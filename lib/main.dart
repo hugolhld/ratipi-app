@@ -1,4 +1,3 @@
-import 'package:explore_fultter/utils/firebase_messaging.dart';
 import 'package:explore_fultter/utils/local_notifications.dart';
 import 'package:explore_fultter/utils/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,16 +16,22 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // await FirebaseMessage().initNotifications();
-
   LocalNotifications().initNotifications();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => NotificationProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => NotificationProvider(),
+        ),
+      ],
       child: const MyApp(),
-    ),
-  );
+    )
+      // ChangeNotifierProvider(
+      //   create: (context) => NotificationProvider(),
+      //   child: const MyApp(),
+      // ),
+      );
 }
 
 class MyApp extends StatefulWidget {
@@ -63,7 +68,6 @@ class _MyAppState extends State<MyApp> {
       await prefs.setString('userId', userId);
     }
 
-    // Récupérer les favoris pour éviter des appels répétés aux async
     _favorites = prefs.getStringList('favorites') ?? [];
 
     setState(() {
@@ -73,7 +77,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _onItemTapped(int index) {
-
     LocalNotifications().showNotification(
       title: 'Hello, World!',
       body: 'This is a notification from Flutter!',
@@ -105,7 +108,9 @@ class _MyAppState extends State<MyApp> {
                     child: StreamBuilder<Map>(
                       stream: WebSocketManager().messageStream,
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.active && snapshot.hasData) {
+                        if (snapshot.connectionState ==
+                                ConnectionState.active &&
+                            snapshot.hasData) {
                           final data = snapshot.data!;
                           final stopData = data['stop'] ?? '';
                           final uuidData = data['uuid'] ?? '';
@@ -115,29 +120,33 @@ class _MyAppState extends State<MyApp> {
                           return FutureBuilder<bool>(
                             future: _checkIfFavorite(routeData),
                             builder: (context, favoriteSnapshot) {
-                              if (favoriteSnapshot.connectionState == ConnectionState.done && favoriteSnapshot.hasData) {
+                              if (favoriteSnapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  favoriteSnapshot.hasData) {
                                 if (favoriteSnapshot.data == true) {
-
                                   LocalNotifications().showNotification(
                                     title: 'Alerte $alertData reçue',
-                                    body: 'Notification $alertData reçue: $stopData sur la ligne $routeData',
+                                    body:
+                                        'Notification $alertData reçue: $stopData sur la ligne $routeData',
                                   );
 
-                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Notification $alertData reçue: $stopData de $uuidData')),
+                                      SnackBar(
+                                          content: Text(
+                                              'Notification $alertData reçue: $stopData de $uuidData')),
                                     );
                                   });
                                 }
-                                return Container(); // Ne rien afficher si la route est dans les favoris
+                                return Container();
                               } else {
-                                return Container(); // Retourner un conteneur vide pendant la vérification
+                                return Container();
                               }
                             },
                           );
                         }
-
-                        return Container(); // Retourner un conteneur vide si aucune donnée
+                        return Container();
                       },
                     ),
                   ),

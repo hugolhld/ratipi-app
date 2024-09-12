@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:explore_fultter/utils/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore_fultter/components/StopView.dart';
 
 class ListAlert extends StatefulWidget {
@@ -61,20 +60,19 @@ class _ListAlertState extends State<ListAlert> {
             ),
             const SizedBox(height: 20),
             Expanded(
-              // Utiliser Consumer pour écouter les changements dans NotificationProvider
               child: Consumer<NotificationProvider>(
                 builder: (context, notificationProvider, child) {
                   if (notificationProvider.isLoading) {
                     return const CircularProgressIndicator();
                   } else if (notificationProvider.hasError) {
                     return const Text('Error loading notifications');
-                  } else if (notificationProvider.notifications.isEmpty) {
+                  } else if (notificationProvider.getNotificationsForRoute(widget.routeId!).isEmpty) {
                     return const Text('No notifications found');
                   } else {
                     return ListView.builder(
-                      itemCount: notificationProvider.notifications.length,
+                      itemCount: notificationProvider.getNotificationsForRoute(widget.routeId!).length,
                       itemBuilder: (context, index) {
-                        final item = notificationProvider.notifications[index];
+                        final item = notificationProvider.getNotificationsForRoute(widget.routeId!)[index];
                         final timestamp = item['timestamp'];
                         final DateTime notificationTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
                         final Duration timeDifference = DateTime.now().difference(notificationTime);
