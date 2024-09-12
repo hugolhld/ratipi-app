@@ -30,7 +30,7 @@ class _ListItemState extends State<ListItem> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkIfFavorite();
       Provider.of<NotificationProvider>(context, listen: false)
-          .fetchNotifications(widget.subtitle!);
+          .fetchNotifications(widget.subtitle);
     });
   }
 

@@ -8,7 +8,7 @@ class LocalNotifications {
 
         var initializationSettingsAndroid = const AndroidInitializationSettings('app_icon');
 
-        var InitializationSettingsIOS = DarwinInitializationSettings(
+        var initializationSettingsIOS = DarwinInitializationSettings(
           requestAlertPermission: true,
           requestBadgePermission: true,
           requestSoundPermission: true,
@@ -19,7 +19,7 @@ class LocalNotifications {
 
         var initializationSettings = InitializationSettings(
           android: initializationSettingsAndroid,
-          iOS: InitializationSettingsIOS,
+          iOS: initializationSettingsIOS,
         );
 
         await flutterLocalNotificationsPlugin.initialize(

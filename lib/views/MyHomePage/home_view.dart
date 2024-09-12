@@ -13,7 +13,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _searchQuery = '';
   List<Map<String, dynamic>> _filteredData = [];
-  Set<String> _selectedModes = {}; // Store selected modes for filtering
+  final Set<String> _selectedModes = {}; // Store selected modes for filtering
 
   // Load unique metro or tramway lines (not stations)
   Future<void> _loadData() async {

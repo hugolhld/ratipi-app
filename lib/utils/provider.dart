@@ -47,8 +47,6 @@ class NotificationProvider with ChangeNotifier {
       _notificationsByRoute[routeId] = notifications.docs
           .map((doc) => doc.data() as Map<String, dynamic>)
           .toList();
-      print(
-          'Fetched ${notifications.docs.length} notifications for route $routeId');
     } catch (e) {
       _setErrorState(true);
       print('Error fetching notifications: $e');
@@ -76,7 +74,6 @@ class NotificationProvider with ChangeNotifier {
 
   // Fonction appelée lorsque de nouvelles notifications arrivent via WebSocket
   void _addNotification(Map<String, dynamic> newNotification) {
-    print(newNotification);
     String routeId = newNotification[
         'route']; // Assumes each notification has a 'routeId' field
     if (_notificationsByRoute.containsKey(routeId)) {
