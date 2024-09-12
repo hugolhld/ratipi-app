@@ -35,8 +35,8 @@ class _NotificationPageState extends State<NotificationPage> {
             return const Center(child: Text('Error fetching notifications'));
           }
 
-          final notifications = provider.allNotifications; // Ensure this method exists in your provider
-          
+          final notifications = provider.allNotifications;
+
           if (notifications.isEmpty) {
             return const Center(child: Text('No notifications available.'));
           }
@@ -45,9 +45,29 @@ class _NotificationPageState extends State<NotificationPage> {
             itemCount: notifications.length,
             itemBuilder: (context, index) {
               final notification = notifications[index];
-              return ListTile(
-                title: Text('Arrêt: ${notification['stop']}'),
-                subtitle: Text('Ligne ${notification['route']}'),
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 2,
+                  child: ListTile(
+                    leading: const Icon(Icons.warning_amber_rounded,
+                        color: Colors.red), // Icône d'alerte
+                    title: Text('Stop: ${notification['stop']}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold, // Texte en gras
+                        )),
+                    subtitle: Text('Route ${notification['route']}'),
+                    // trailing: const Icon(Icons.arrow_forward_ios), // Icône à droite
+                    // onTap: () {
+                    //   // Action lorsqu'on appuie sur une notification
+                    // },
+                  ),
+                ),
               );
             },
           );

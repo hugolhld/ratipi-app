@@ -28,6 +28,19 @@ void main() async {
     ],
     child: const MyApp(),
   ));
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => NotificationProvider(),
+      ),
+    ],
+    child: const MyApp(),
+  )
+      // ChangeNotifierProvider(
+      //   create: (context) => NotificationProvider(),
+      //   child: const MyApp(),
+      // ),
+      );
 }
 
 class MyApp extends StatefulWidget {
@@ -87,8 +100,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.tealAccent[400],
-          title: const Text('Hello, World!'),
+          backgroundColor: Colors.teal[400],
+          title: const Text('RATIPI',
+              style: TextStyle(fontWeight: FontWeight.bold)),
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
