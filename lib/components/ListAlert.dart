@@ -6,9 +6,10 @@ import 'package:intl/intl.dart';
 
 class ListAlert extends StatefulWidget {
   final String title;
-  final String? routeId;
+  final String routeId;
+  final String mode;
 
-  const ListAlert({super.key, required this.title, this.routeId});
+  const ListAlert({super.key, required this.title, required this.routeId, required this.mode});
 
   @override
   _ListAlertState createState() => _ListAlertState();
@@ -19,10 +20,8 @@ class _ListAlertState extends State<ListAlert> {
   void initState() {
     super.initState();
     // Fetch notifications when the widget is initialized
-    if (widget.routeId != null) {
-      Provider.of<NotificationProvider>(context, listen: false)
-          .fetchNotifications(widget.routeId!);
-    }
+    Provider.of<NotificationProvider>(context, listen: false)
+        .fetchNotifications(widget.routeId);
   }
 
   @override
@@ -48,19 +47,13 @@ class _ListAlertState extends State<ListAlert> {
                 elevation: 2,
               ),
               onPressed: () {
-                if (widget.routeId != null) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          StopView(stopTitle: widget.routeId!),
+                          StopView(stopTitle: widget.routeId, mode: widget.mode,),
                     ),
                   );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Route ID is missing!')),
-                  );
-                }
               },
             ),
 
@@ -91,21 +84,21 @@ class _ListAlertState extends State<ListAlert> {
               child: Consumer<NotificationProvider>(
                 builder: (context, notificationProvider, child) {
                   if (notificationProvider.isLoading) {
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   } else if (notificationProvider.hasError) {
                     return const Text('Error loading notifications');
                   } else if (notificationProvider
-                      .getNotificationsForRoute(widget.routeId!)
+                      .getNotificationsForRoute(widget.routeId)
                       .isEmpty) {
                     return const Text('No notifications found');
                   } else {
                     return ListView.builder(
                       itemCount: notificationProvider
-                          .getNotificationsForRoute(widget.routeId!)
+                          .getNotificationsForRoute(widget.routeId)
                           .length,
                       itemBuilder: (context, index) {
                         final item = notificationProvider
-                            .getNotificationsForRoute(widget.routeId!)[index];
+                            .getNotificationsForRoute(widget.routeId)[index];
                         final timestamp = item['timestamp'];
                         final DateTime notificationTime =
                             DateTime.fromMillisecondsSinceEpoch(timestamp);

@@ -7,9 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class StopView extends StatefulWidget {
   final String stopTitle;
+  final String mode;
 
   const StopView({
     required this.stopTitle,
+    required this.mode,
     super.key,
   });
 
@@ -33,7 +35,7 @@ class _StopViewState extends State<StopView> {
 
       final List<Map<String, dynamic>> filteredData = data
           .map((item) => item['fields'] as Map<String, dynamic>)
-          .where((fields) => fields['mode'] == 'Metro' && fields['route_long_name'] == widget.stopTitle)
+          .where((fields) => fields['mode'] == widget.mode && fields['route_long_name'] == widget.stopTitle)
           .toList();
 
       setState(() {

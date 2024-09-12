@@ -92,26 +92,22 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   void _handleWebSocketMessage(Map<String, dynamic> message) async {
     final stopData = message['stop'] ?? '';
-    final uuidData = message['uuid'] ?? '';
+    // final uuidData = message['uuid'] ?? '';
     final alertData = message['alert'] ?? '';
     final routeData = message['route'] ?? '';
-
     final isFavorite = await _checkIfFavorite(routeData);
+
     if (isFavorite && stopData.isNotEmpty /* && uuidData == _userId */) {
       LocalNotifications().showNotification(
         title: 'Alerte $alertData reçue',
         body: 'Notification $alertData reçue: $stopData sur la ligne $routeData',
       );
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Notification $alertData reçue: $stopData de $uuidData')),
-        );
-      });
     }
   }
 
   Future<bool> _checkIfFavorite(String route) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _favorites = prefs.getStringList('favorites') ?? [];
     return _favorites?.contains(route) ?? false;
   }
 
@@ -139,7 +135,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         appBar: AppBar(
           backgroundColor: Colors.teal[400],
           title: const Text('RATIPI',
-              style: TextStyle(fontWeight: FontWeight.bold)),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white, letterSpacing: 1.5)),
+              
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
