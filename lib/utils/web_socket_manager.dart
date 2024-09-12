@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 
 class WebSocketManager {
   static final WebSocketManager _instance = WebSocketManager._internal();
   late WebSocketChannel _channel;
-  final String _serverUrl = 'ws://silver-crabs-care.loca.lt';
-  final StreamController<Map<String, dynamic>> _streamController =
-      StreamController<
-          Map<String, dynamic>>.broadcast(); // Utilisation de broadcast
+  final String _serverUrl = dotenv.env['WEBSOCKET_URL'] ?? 'ws://localhost:8080';
+  // final String _serverUrl = 'ws://localhost:8080';
+  final StreamController<Map<String, dynamic>> _streamController = StreamController<Map<String, dynamic>>.broadcast();  // Utilisation de broadcast
 
   factory WebSocketManager() {
     return _instance;

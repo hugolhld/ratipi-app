@@ -98,7 +98,7 @@ class NotificationProvider with ChangeNotifier {
           }).toList();
     });
 
-    notifyListeners(); // Informe les listeners que la liste des notifications a changé
+    notifyListeners();
   }
 
   // Met à jour l'état de chargement et notifie les listeners
