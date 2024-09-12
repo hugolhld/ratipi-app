@@ -44,3 +44,9 @@ app.*.map.json
 
 *.env
 .env
+
+# ignore node_modules
+node_modules/
+
+# ignore package-lock.json
+package-lock.json
