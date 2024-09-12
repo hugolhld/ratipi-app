@@ -1,5 +1,5 @@
-import 'package:explore_fultter/components/list_alert.dart';
-import 'package:explore_fultter/utils/provider.dart';
+import 'package:ratipi/components/list_alert.dart';
+import 'package:ratipi/utils/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

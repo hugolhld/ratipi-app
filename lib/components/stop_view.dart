@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:explore_fultter/utils/firebase.dart';
-import 'package:explore_fultter/utils/web_socket_manager.dart';
+import 'package:ratipi/utils/firebase.dart';
+import 'package:ratipi/utils/web_socket_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';

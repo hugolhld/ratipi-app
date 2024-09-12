@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:explore_fultter/utils/local_notifications.dart';
-import 'package:explore_fultter/utils/provider.dart';
+import 'package:ratipi/utils/local_notifications.dart';
+import 'package:ratipi/utils/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -8,9 +8,9 @@ import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'package:explore_fultter/utils/web_socket_manager.dart';
-import 'package:explore_fultter/views/MyHomePage/home_view.dart';
-import 'package:explore_fultter/views/NotificationsPage/notifications_view.dart';
+import 'package:ratipi/utils/web_socket_manager.dart';
+import 'package:ratipi/views/MyHomePage/home_view.dart';
+import 'package:ratipi/views/NotificationsPage/notifications_view.dart';
 
 void main() async {
   await dotenv.load(fileName: '.env');

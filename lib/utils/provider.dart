@@ -1,9 +1,8 @@
 import 'dart:async';
-
-import 'package:explore_fultter/utils/firebase.dart';
+import 'package:ratipi/utils/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:explore_fultter/utils/web_socket_manager.dart';
+import 'package:ratipi/utils/web_socket_manager.dart';
 
 class NotificationProvider with ChangeNotifier {
   final Map<String, List<Map<String, dynamic>>> _notificationsByRoute = {};

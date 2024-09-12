@@ -1,4 +1,4 @@
-import 'package:explore_fultter/utils/provider.dart';
+import 'package:ratipi/utils/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
