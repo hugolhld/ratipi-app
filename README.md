@@ -14,6 +14,8 @@
  - After just run `lt --port 8080` for expose your localhost
 
 ### Run App
+ - Copy `.env.example` to `.env`
+ - Paste your `ws://` with your server ip of web sockets
  - You need *Flutter SDK* installed on your machine
  - At root of project
  - Run `flutter pub get`
