@@ -3,7 +3,7 @@
 ## Getting Started
 
 ### WebSocket Server
-
+ - For the moment you can use `wss://ws.hugolhld.xyz:3000`
  - Create a web sockets server or go in foler web socket at root of project
  - If you want start WS from project
  - Run `npm i` in `/WS-server`
