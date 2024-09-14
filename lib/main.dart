@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:ratipi/utils/local_notifications.dart';
 import 'package:ratipi/utils/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:ratipi/views/MapPage/map_view.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +23,8 @@ void main() async {
 
   LocalNotifications().initNotifications();
 
+  MapboxOptions.setAccessToken(dotenv.env['MAPBOX_ACCESS_TOKEN']!);
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -28,6 +32,7 @@ void main() async {
       ),
     ],
     child: const MyApp(),
+    // child: LocationPage(),
   ));
 }
 
@@ -46,7 +51,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late WebSocketManager _webSocketManager;
   late StreamSubscription<Map> _webSocketSubscription;
 
+
   static final List<Widget> _pages = <Widget>[
+    // MapWidget(
+      
+    //   // cameraOptions: CameraOptions(
+    //   //   center: Point(coordinates: Position(-98.0, 39.5)), 
+    //   //   zoom: 2, 
+    //   //   bearing: 0, 
+    //   //   pitch: 0,
+    //   // ),
+    // ),
+    LocationPage(),
     const MyHomePage(),
     const NotificationPage(),
   ];
