@@ -52,5 +52,15 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+		<string>We need your location to show it on the map.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+		<string>We need your location to always track your position.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>We need your location to always and when in use.</string>
+	<key>MBXAccessToken</key>
+		<string>pk.eyJ1IjoiaHVnb2xobGQiLCJhIjoiY2x2NTA2bHphMGJ4cjJxbzlyNjN6ZTF5YyJ9.zeBXs_6aXxSALqh5O768eg</string> <!-- Remplace par ta clé API -->
+
+
 </dict>
 </plist>

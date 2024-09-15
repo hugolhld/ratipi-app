@@ -4,6 +4,7 @@ import 'package:ratipi/utils/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:ratipi/views/MapPage/map_view.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,6 +48,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late StreamSubscription<Map> _webSocketSubscription;
 
   static final List<Widget> _pages = <Widget>[
+    LocationPage(),
     const MyHomePage(),
     const NotificationPage(),
   ];
